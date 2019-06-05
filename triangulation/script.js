@@ -1,12 +1,16 @@
-function drawTriangulatedPolygon(ctx, polygonPoints) {
+function drawTriangulatedPolygon(ctx, polygonPoints, colors) {
     let pts = polygonPoints.slice();
+
+    let initialFillStyle = ctx.fillStyle;
 
     for (let i = 0; pts.length; i++) {
         let earPos = findEar(pts);
         let triangle = getTriangle(earPos, pts);
 
+        ctx.fillStyle = colors[i % colors.length];
+
         if (triangle !== false)
-            drawPolygon(ctx, triangle);
+            drawPolygon(ctx, triangle, true);
         else
             break;
 
@@ -17,6 +21,8 @@ function drawTriangulatedPolygon(ctx, polygonPoints) {
         else
             pts.splice(earPos + 1, 1);
     }
+
+    ctx.fillStyle = initialFillStyle;
 }
 
 function findEar(polygonPoints) {
@@ -116,7 +122,7 @@ function inside(point, points) {
     return inside;
 }
 
-function drawPolygon(ctx, points) {
+function drawPolygon(ctx, points, fill = false) {
     ctx.beginPath();
     ctx.moveTo(points[0].x, points[0].y);
 
@@ -124,6 +130,9 @@ function drawPolygon(ctx, points) {
         ctx.lineTo(points[i].x, points[i].y);
     }
     ctx.closePath();
+
+    if (fill)
+        ctx.fill();
 
     ctx.stroke();
 }
@@ -225,6 +234,17 @@ function initCanvas(canvasId) {
         height: canvasHeight
     }} = initCanvas(CANVAS_ID);
 
+    const colors = [
+        '#993333',
+        '#d28345',
+        '#f4bf75',
+        '#90a959',
+        '#75b6ab',
+        '#6b9fb5',
+        '#aa769f',
+        '#875636'
+    ];
+
     drawTriangulatedPolygon(ctx, generatePolygon({
         x: canvasWidth / 2,
         y: canvasHeight / 2
@@ -232,5 +252,6 @@ function initCanvas(canvasId) {
         10,
         250,
         1,
-        0));
+        0),
+    colors);
 })();
